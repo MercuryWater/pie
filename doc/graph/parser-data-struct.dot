@@ -1,0 +1,45 @@
+digraph structs {
+	node [shape=record];
+	packet_info	[label="{ packet_info | { offset | length_remaining } }"];
+	packet	[label="{ packet | { { byte0 | { bit0 | bit2 | ... | bit7 } } | ... | byteN } }"];
+	varible_cursor	[label="{ varible_cursor }"];
+	local_buffer	[label="
+{ runtime_varible | { rv0 | ... | rvN } } |
+{ parser_global_varible | { pgv0 | ... | pgvN } } |
+{ state_local_varible | { state0 | var0 | ... | varN} | ... | { stateN | var0 | ... | varN } }"];
+	data_buffer	[label="
+{ <fixed_read_only_metadata> fixed_read_only_metadata | { varible_data_offset | length | timestamp | port | ... } } |
+{ fixed_read_write_metadata | { error | drop | dest | ... } } |
+{ header_valid | { hv0 | ... | hvN} } |
+{ user_metadata | { { um0 | { f0 | ... | fN } } | ... | umN } } |
+{ <fixed_header> fixed_header | { { fh0 | { f0 | ... | fN } } | ... | fhN } } |
+{ <stack_info> stack_info | { { si0 | { current_index } } | ... | siN } } |
+{ <stack_header> stack_header | { { sh0 | { id0 | ... | idN} } | ... | shN } } |
+{ <varible_info> varible_info | { { vi0 | { offset | length } } | ... | viN } } |
+{ <stack_varible_info> stack_varible_info | { { svi0 | { current_index | { id0 | { offset | length} } | ... | id N} } | ... | sviN } } |
+{ <varible_header> varible_header | { vh0 | ... | vhN } } |
+pad"];
+	state_tcam [label="{ state_tcam | { { entry0 | { key | mask | value } } | ... | entryN | { runtime_entry0 | { key | mask | value } } | ... | runtime_entryN } }"];
+	state_register;
+	request_register	[label="{ request_register | { <current_state> current_state | u8_0 | u8_1 | u8_2 | u16_0 | u32_0 } }"];
+	response_register [label="{ response_register | { <next_state> next_state | <next_addr> next_addr } }"];
+	instruction_memory	[label="{instruction_memory | state_error | state_end | state_start | state0 | ... | stateN }"];
+
+	packet -> data_buffer:fixed_read_only_metadata;
+	packet -> data_buffer:fixed_header;
+	packet -> data_buffer:stack_header;
+	packet -> data_buffer:varible_header;
+	varible_cursor -> data_buffer:varible_info;
+	varible_cursor -> data_buffer:stack_varible_info;
+	data_buffer:stack_info -> data_buffer:stack_header;
+	data_buffer:varible_info -> data_buffer:varible_header;
+	data_buffer:stack_varible_info -> data_buffer:varible_header;
+	data_buffer -> local_buffer;
+
+	data_buffer -> request_register;
+	request_register -> state_tcam;
+	state_tcam -> response_register;
+	state_register -> request_register:current_state;
+	response_register:next_state -> state_register;
+	response_register:next_addr -> instruction_memory;
+}
