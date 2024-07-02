@@ -1,0 +1,38 @@
+digraph architecture {
+    {
+        rank = "same";
+        "pie-lang-src";
+        "pie-architeure-model";
+    }
+
+    {
+        rank = "same";
+        "pie-pipeline-runtime";
+        "pie-runtime-api";
+    }
+
+    {
+        rank = "same";
+        "input-packet";
+        "output-packet";
+        "pie-pipeline";
+    }
+
+    "pie-compiler" [shape = rect];
+    "pie-runtime" [shape = rect];
+    "pie-pipeline" [shape = rect];
+    "control-plane" [shape = rect];
+    "table" [shape = rect];
+
+    "control-plane" -> "pie-runtime";
+    "pie-runtime" -> "table";
+    "table" -> "pie-pipeline";
+    "pie-lang-src" -> "pie-compiler";
+    "pie-architeure-model" -> "pie-compiler";
+    "pie-compiler" -> "pie-pipeline-runtime";
+    "pie-compiler" -> "pie-runtime-api";
+    "pie-pipeline-runtime" -> "pie-pipeline";
+    "pie-runtime-api" -> "pie-runtime";
+    "input-packet" -> "pie-pipeline";
+    "pie-pipeline" -> "output-packet";
+}
