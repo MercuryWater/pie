@@ -1,0 +1,31 @@
+digraph "parser-data-struct-detail" {
+    node [shape = record;];
+
+    packet_info [label = "{ packet_info | { parsed | remaining } }";];
+    packet [label = "{ packet | { { byte0 | { bit0 | bit2 | ... | bit7 } } | ... | byteN } }";];
+    local_buffer [label = "{ local_buffer | { { runtime_varible | { rv0 | ... | rvN } } | { parser_global_varible | { pgv0 | ... | pgvN } } | { state_local_varible | { state0 | var0 | ... | varN} | ... | { stateN | var0 | ... | varN } } } }";];
+    parsed_packet_buffer [label = "{ parsed_packet_buffer | { { fixed_read_only_metadata | { length | timestamp | port | ... } } | { fixed_read_write_metadata | { error | dest | ... } } | { header_valid | { hv0 | ... | hvN} } | { user_metadata | {f0 | ... | fN } } | { fixed_header | { { fh0 | { f0 | ... | fN } } | ... | fhN } } | { stack_info | { { si0 | { next } } | ... | siN } } | { stack_header | { { sh0 | { id0 | ... | idN} } | ... | shN } } | { varible_info | { { vi0 | { offset | length } } | ... | viN } } | { stack_varible_info | { { svi0 | { next | { id0 | { offset | length} } | ... | id N} } | ... | sviN } } | { varible_header | { vh0 | ... | vhN } } | pad } }";];
+    general_purpose_register [label = "{ general_purpose_register | { gpr0 | ... | gprN } }"]
+    state_register;
+    state_request [label = "{ state_request | { current_state | u8_0 | u8_1 | u8_2 | u16_0 | u32_0 } }";];
+    state_response [label = "{ state_response | { next_state | next_pc } }";];
+    state_table [label = "{ state_table | { { static_entry | { { entry0 | { mask | value | result } } | ... | entryN } } | { runtime_entry | { { entry0 | { mask | value | result } } | ... | entryN } } } }";];
+    instruction_memory [label = "{ instruction_memory | bootrom | state_error | state_end | state_start | state0 | ... | stateN }";];
+
+    packet -> parsed_packet_buffer;
+    packet -> general_purpose_register;
+    packet -> local_buffer;
+    packet_info -> general_purpose_register;
+    general_purpose_register -> packet_info;
+    instruction_memory -> general_purpose_register;
+    general_purpose_register -> parsed_packet_buffer;
+    parsed_packet_buffer -> general_purpose_register;
+    general_purpose_register -> state_request;
+    general_purpose_register -> local_buffer;
+    local_buffer -> general_purpose_register;
+    state_response -> general_purpose_register;
+    state_register -> state_request;
+    state_response -> state_register;
+    state_request -> state_table;
+    state_table -> state_response;
+}

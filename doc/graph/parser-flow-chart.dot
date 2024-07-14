@@ -1,0 +1,82 @@
+digraph "parser-flow-chart" {
+
+    {
+        rank="min";
+        bootrom;
+        _start;
+        _init;
+    }
+
+    {
+        rank="same";
+        _wait_packet;
+        _send_packet;
+    }
+
+    {
+        rank="same";
+        varify;
+        transition;
+        extract;
+    }
+
+    {
+        rank="same";
+        extract_fixed;
+        extract_varible;
+        extract_stack;
+        extract_stack_varible;
+    }
+
+    bootrom -> _start;
+    _start -> _init;
+    _init -> _wait_packet;
+    _wait_packet -> state;
+    _send_packet -> _wait_packet;
+    state -> extract;
+    state -> advance;
+    state -> transition;
+    state -> varify;
+    varify -> state;
+    varify -> _error;
+    _error -> _end;
+    _end -> _send_packet;
+
+    transition -> select;
+    transition -> accept;
+    transition -> reject;
+    accept -> _end;
+    reject -> _end;
+
+    select -> make_request;
+    make_request -> csr_write;
+    csr_write -> make_request;
+    make_request -> lookup_state_table;
+    lookup_state_table -> update_state_id;
+    update_state_id -> jump_next_state;
+    jump_next_state -> state;
+
+    extract -> extract_fixed;
+    extract -> extract_varible;
+    extract -> extract_stack;
+    extract -> extract_stack_varible;
+
+    extract_fixed -> copy_packet;
+    copy_packet -> set_valid;
+    set_valid -> advance;
+    update_packet_info -> state;
+
+    extract_varible -> set_varible_info;
+    set_varible_info -> copy_packet;
+
+    extract_stack -> set_stack_info;
+    set_stack_info -> copy_packet;
+
+    extract_stack_varible -> set_stack_varible_info;
+    set_stack_varible_info -> copy_packet;
+
+    advance -> advance_fixed;
+    advance_fixed -> update_packet_info;
+    advance -> advance_varible;
+    advance_varible -> update_packet_info;
+}

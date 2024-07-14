@@ -1,0 +1,29 @@
+digraph "parser-data-struct-top" {
+    node [shape = record;];
+
+    instruction_memory;
+    packet_info;
+    packet;
+    parsed_packet_buffer;
+    general_purpose_register;
+    local_buffer;
+    state_register;
+    state_table;
+    state_request;
+    state_response;
+
+    packet -> parsed_packet_buffer;
+    packet -> general_purpose_register;
+    packet -> local_buffer;
+    packet_info -> general_purpose_register;
+    instruction_memory -> general_purpose_register;
+    general_purpose_register -> parsed_packet_buffer;
+    general_purpose_register -> state_request;
+    general_purpose_register -> local_buffer;
+    local_buffer -> general_purpose_register;
+    state_response -> general_purpose_register;
+    state_register -> state_request;
+    state_response -> state_register;
+    state_request -> state_table;
+    state_table -> state_response;
+}
